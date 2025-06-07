@@ -22,6 +22,7 @@
 
     header img {
       width: 100px;
+      filter: brightness(0) invert(1); /* logo blanco */
       margin-bottom: 10px;
     }
 
@@ -70,6 +71,43 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .movimiento {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .ingreso {
+      background-color: #e6f9ec;
+      color: #1a7f4f;
+    }
+
+    .gasto {
+      background-color: #ffe9e9;
+      color: #a12626;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+      font-size: 16px;
+    }
+
+    .delete-btn:hover {
+      color: #e00;
+    }
   </style>
 </head>
 <body>
@@ -77,6 +115,7 @@
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
   </header>
+
   <div class="container">
     <div class="summary">
       <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
@@ -101,10 +140,15 @@
       <h3>Gráfico de Ingresos vs Gastos</h3>
       <canvas id="graficoFinanzas"></canvas>
     </div>
+
+    <div class="card">
+      <h3>Movimientos recientes</h3>
+      <ul id="lista-movimientos"></ul>
+    </div>
   </div>
 
   <script>
-    const supabase = supabase.createClient(
+    const client = window.supabase.createClient(
       'https://iyskzhgjvchokwfxgqyc.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
     );
@@ -126,7 +170,7 @@
         labels: ['Ingresos', 'Gastos'],
         datasets: [{
           label: 'Resumen mensual',
-          data: [ingresos, gastos],
+          data: [0, 0],
           backgroundColor: ['#00c6ff', '#ff6b6b']
         }]
       },
@@ -142,27 +186,66 @@
       }
     });
 
+    async function eliminarMovimiento(id) {
+      const { error } = await client.from('movimientos').delete().eq('id', id);
+      if (!error) cargarMovimientos();
+    }
+
+    async function cargarMovimientos() {
+      const { data, error } = await client
+        .from('movimientos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error al cargar movimientos:", error);
+        return;
+      }
+
+      const lista = document.getElementById("lista-movimientos");
+      lista.innerHTML = '';
+
+      ingresos = 0;
+      gastos = 0;
+
+      data.forEach(mov => {
+        const li = document.createElement("li");
+        li.classList.add('movimiento');
+        li.classList.add(mov.tipo === "ingreso" ? "ingreso" : "gasto");
+
+        li.innerHTML = `
+          <span>${mov.tipo.toUpperCase()}: $${mov.monto} - ${mov.descripcion}</span>
+          <button class="delete-btn" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
+        `;
+
+        lista.appendChild(li);
+
+        if (mov.tipo === "ingreso") ingresos += mov.monto;
+        else gastos += mov.monto;
+      });
+
+      actualizarUI();
+      grafico.data.datasets[0].data = [ingresos, gastos];
+      grafico.update();
+    }
+
     document.getElementById("mov-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const descripcion = document.getElementById("descripcion").value;
       const monto = parseFloat(document.getElementById("monto").value);
       const tipo = document.getElementById("tipo").value;
 
-      if (tipo === 'ingreso') ingresos += monto;
-      else gastos += monto;
+      if (!descripcion || isNaN(monto)) return;
 
-      actualizarUI();
-      grafico.data.datasets[0].data = [ingresos, gastos];
-      grafico.update();
-
-      await supabase.from("movimientos").insert([
+      await client.from("movimientos").insert([
         { descripcion, monto, tipo }
       ]);
 
       e.target.reset();
+      await cargarMovimientos();
     });
 
-    actualizarUI();
+    cargarMovimientos();
   </script>
 </body>
 </html>
