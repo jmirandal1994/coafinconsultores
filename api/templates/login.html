@@ -119,7 +119,7 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const usuarioIngresado = form.email.value.trim().toLowerCase();
+      const usuarioIngresado = form.email.value.trim();
       const passwordIngresada = form.password.value;
 
       const { data, error } = await supabase
@@ -129,10 +129,11 @@
         .eq('password', passwordIngresada)
         .single();
 
+      console.log("Respuesta Supabase:", { data, error });
+
       if (error || !data) {
         errorMsg.textContent = 'Usuario o contraseña incorrectos';
       } else {
-        // Redirige según tipo de usuario
         if (data.tipo_usuario === 'admin') {
           window.location.href = '/dashboard/admin.html';
         } else {
