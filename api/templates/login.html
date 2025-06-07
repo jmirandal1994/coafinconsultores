@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - COAFIN</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      width: 320px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    .input-field {
+      position: relative;
+      margin: 20px 0;
+      border-bottom: 2px solid #ccc;
+    }
+
+    .input-field input {
+      width: 100%;
+      padding: 10px 5px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .input-field label {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      color: #fff;
+      pointer-events: none;
+      transition: 0.2s ease;
+    }
+
+    .input-field input:focus + label,
+    .input-field input:valid + label {
+      top: 0;
+      font-size: 0.8rem;
+      color: #ccc;
+    }
+
+    .login-btn {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background-color: #00c6ff;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background-color: #007fa6;
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="login-container">
+    <img src="./assets/logo.png" alt="COAFIN Logo" class="logo" />
+    <form id="login-form">
+      <h2>Login</h2>
+
+      <div class="input-field">
+        <input type="email" id="email" required />
+        <label for="email">Correo Electrónico</label>
+      </div>
+
+      <div class="input-field">
+        <input type="password" id="password" required />
+        <label for="password">Contraseña</label>
+      </div>
+
+      <button type="submit" class="login-btn">Ingresar</button>
+      <p class="error-message" id="error-msg"></p>
+    </form>
+  </div>
+
+  <script>
+    const supabase = supabase.createClient(
+      'https://iyskzhgjvchokwfxgqyc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
+    );
+
+    const form = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.email.value;
+      const password = form.password.value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        errorMsg.textContent = 'Correo o contraseña incorrectos';
+      } else {
+        // Aquí puedes diferenciar si es admin o cliente
+        // Por ahora redirige a cliente.html
+        window.location.href = './dashboard/cliente.html';
+      }
+    });
+  </script>
+</body>
+</html>
