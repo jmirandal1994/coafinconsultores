@@ -83,6 +83,7 @@
       <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
       <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
     </div>
+
     <div class="card">
       <h3>Registrar Movimiento</h3>
       <form id="mov-form">
@@ -95,6 +96,7 @@
         <button type="submit">Guardar</button>
       </form>
     </div>
+
     <div class="card">
       <h3>Gráfico de Ingresos vs Gastos</h3>
       <canvas id="graficoFinanzas"></canvas>
@@ -103,8 +105,8 @@
 
   <script>
     const supabase = supabase.createClient(
-      'https://iyskzhgjvchokwfxgqyc.supabase.co,
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A
+      'https://iyskzhgjvchokwfxgqyc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
     );
 
     let ingresos = 0;
