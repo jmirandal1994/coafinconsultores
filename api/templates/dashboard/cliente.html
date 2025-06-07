@@ -147,6 +147,7 @@
   <header>
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
+    <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
   </header>
 
   <div class="container">
@@ -276,6 +277,9 @@
     async function eliminarMovimiento(id) {
       await supabase.from("movimientos").delete().eq("id", id);
       cargarMovimientos();
+    }
+    function cerrarSesion() {
+      window.location.href = "/";
     }
 
     document.getElementById("aplicarFiltros").addEventListener("click", () => {
