@@ -164,6 +164,26 @@
     </div>
 
     <div class="card">
+      <h3>Registrar Movimiento</h3>
+      <form id="mov-form">
+        <input type="text" id="descripcion" placeholder="Descripción" required />
+        <input type="number" id="monto" placeholder="Monto" required />
+        <select id="tipo">
+          <option value="ingreso">Ingreso</option>
+          <option value="gasto">Gasto</option>
+        </select>
+        <select id="categoria">
+          <option value="Servicios">Servicios</option>
+          <option value="Insumos">Insumos</option>
+          <option value="Honorarios">Honorarios</option>
+          <option value="Arriendo">Arriendo</option>
+          <option value="Publicidad">Publicidad</option>
+        </select>
+        <button type="submit">Guardar</button>
+      </form>
+    </div>
+
+    <div class="card">
       <h3>Filtros</h3>
       <div class="filtros">
         <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
@@ -177,9 +197,10 @@
         </select>
         <input type="date" id="fechaDesde" />
         <input type="date" id="fechaHasta" />
+        <button id="aplicarFiltros">Buscar</button>
       </div>
       <button id="descargarExcel">Descargar Excel</button>
-    </div>
+    </div> 
     
     <div class="graficos">
       <div class="card">
