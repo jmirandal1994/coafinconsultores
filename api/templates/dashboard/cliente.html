@@ -240,6 +240,7 @@
       const { data, error } = await supabase.from("movimientos").select("*").order("created_at", { ascending: false });
       if (error) return alert("Error cargando movimientos");
       movimientos = data;
+      console.log("Movimientos cargados:", movimientos);
       renderizarMovimientos(data);
     }
 
