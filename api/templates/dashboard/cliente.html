@@ -47,6 +47,8 @@
 
     .card h3 {
       margin-top: 0;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
     .summary {
@@ -157,6 +159,11 @@
       <h3>Movimientos recientes</h3>
       <ul id="lista-movimientos"></ul>
     </div>
+
+    <div class="card">
+      <h3>Distribución por Categoría</h3>
+      <canvas id="graficoCategorias"></canvas>
+    </div>
   </div>
 
   <script>
@@ -167,6 +174,7 @@
 
     let ingresos = 0;
     let gastos = 0;
+    const categoriaData = {};
 
     function actualizarUI() {
       const balance = ingresos - gastos;
@@ -188,14 +196,23 @@
       },
       options: {
         responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { mode: 'index', intersect: false }
-        },
-        scales: {
-          y: { beginAtZero: true }
-        }
+        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+        scales: { y: { beginAtZero: true } }
       }
+    });
+
+    const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
+    const graficoCategorias = new Chart(ctxCategorias, {
+      type: 'pie',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Distribución por Categoría',
+          data: [],
+          backgroundColor: ['#4dc9f6','#f67019','#f53794','#537bc4','#acc236','#166a8f']
+        }]
+      },
+      options: { responsive: true }
     });
 
     async function eliminarMovimiento(id) {
@@ -219,6 +236,7 @@
 
       ingresos = 0;
       gastos = 0;
+      const categorias = {};
 
       data.forEach(mov => {
         const li = document.createElement("li");
@@ -230,6 +248,9 @@
         `;
         lista.appendChild(li);
 
+        if (!categorias[mov.categoria]) categorias[mov.categoria] = 0;
+        categorias[mov.categoria] += mov.monto;
+
         if (mov.tipo === "ingreso") ingresos += mov.monto;
         else gastos += mov.monto;
       });
@@ -237,6 +258,10 @@
       actualizarUI();
       grafico.data.datasets[0].data = [ingresos, gastos];
       grafico.update();
+
+      graficoCategorias.data.labels = Object.keys(categorias);
+      graficoCategorias.data.datasets[0].data = Object.values(categorias);
+      graficoCategorias.update();
     }
 
     document.getElementById("mov-form").addEventListener("submit", async (e) => {
