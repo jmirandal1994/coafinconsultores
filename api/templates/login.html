@@ -109,7 +109,7 @@
   </div>
 
   <script>
-    const supabase = supabase.createClient(
+    const client = window.supabase.createClient(
       'https://iyskzhgjvchokwfxgqyc.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
     );
@@ -122,7 +122,7 @@
       const usuarioIngresado = form.email.value.trim();
       const passwordIngresada = form.password.value;
 
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('usuarios')
         .select('*')
         .eq('usuario', usuarioIngresado)
