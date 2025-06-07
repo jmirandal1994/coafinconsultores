@@ -6,6 +6,7 @@
   <title>Dashboard Cliente - COAFIN</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -33,7 +34,7 @@
 
     .container {
       padding: 30px;
-      max-width: 900px;
+      max-width: 1100px;
       margin: auto;
     }
 
@@ -59,6 +60,9 @@
     .summary .card {
       flex: 1;
       text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.15);
     }
 
     form input, form select {
@@ -125,6 +129,25 @@
       flex: 1;
       min-width: 250px;
     }
+
+    #descargarExcel {
+      background-color: #1a73e8;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .filtros input, .filtros select {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -141,25 +164,23 @@
     </div>
 
     <div class="card">
-      <h3>Registrar Movimiento</h3>
-      <form id="mov-form">
-        <input type="text" id="descripcion" placeholder="Descripción" required />
-        <input type="number" id="monto" placeholder="Monto" required />
-        <select id="tipo">
-          <option value="ingreso">Ingreso</option>
-          <option value="gasto">Gasto</option>
-        </select>
-        <select id="categoria">
+      <h3>Filtros</h3>
+      <div class="filtros">
+        <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
+        <select id="filtroCategoria">
+          <option value="">Todas las categorías</option>
           <option value="Servicios">Servicios</option>
           <option value="Insumos">Insumos</option>
           <option value="Honorarios">Honorarios</option>
           <option value="Arriendo">Arriendo</option>
           <option value="Publicidad">Publicidad</option>
         </select>
-        <button type="submit">Guardar</button>
-      </form>
+        <input type="date" id="fechaDesde" />
+        <input type="date" id="fechaHasta" />
+      </div>
+      <button id="descargarExcel">Descargar Excel</button>
     </div>
-
+    
     <div class="graficos">
       <div class="card">
         <h3>Gráfico de Ingresos vs Gastos</h3>
