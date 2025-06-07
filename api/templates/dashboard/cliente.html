@@ -13,36 +13,26 @@
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f8;
     }
-
     header {
       background-color: #0f2027;
       color: white;
       padding: 20px;
       text-align: center;
     }
-
     header img {
       width: 150px;
       filter: brightness(0) invert(1);
       margin-bottom: 10px;
     }
-
     header h1 {
       font-size: 22px;
       margin-top: 8px;
     }
-
-     .card canvas {
-      width: 100% !important;
-      height: 280px !important;
-    }
-    
     .container {
       padding: 30px;
       max-width: 1100px;
       margin: auto;
     }
-
     .card {
       background: white;
       padding: 20px;
@@ -50,18 +40,15 @@
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-
     .card h3 {
       margin-top: 0;
       text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
     }
-
     .summary {
       display: flex;
       justify-content: space-between;
       gap: 20px;
     }
-
     .summary .card {
       flex: 1;
       text-align: center;
@@ -69,7 +56,6 @@
       font-size: 18px;
       text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.15);
     }
-
     form input, form select {
       padding: 10px;
       margin: 10px 0;
@@ -77,7 +63,6 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     form button {
       padding: 10px 20px;
       background-color: #0f2027;
@@ -86,12 +71,10 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
     ul {
       list-style: none;
       padding-left: 0;
     }
-
     .movimiento {
       display: flex;
       justify-content: space-between;
@@ -101,17 +84,14 @@
       border-radius: 6px;
       font-size: 14px;
     }
-
     .ingreso {
       background-color: #e6f9ec;
       color: #1a7f4f;
     }
-
     .gasto {
       background-color: #ffe9e9;
       color: #a12626;
     }
-
     .delete-btn {
       background: none;
       border: none;
@@ -119,48 +99,26 @@
       color: #888;
       font-size: 16px;
     }
-
     .delete-btn:hover {
       color: #e00;
     }
-
     .graficos {
       display: flex;
       gap: 20px;
       flex-wrap: wrap;
     }
-
     .graficos .card {
       flex: 1;
       min-width: 250px;
     }
-
-    #descargarExcel {
-      background-color: #1a73e8;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    .filtros {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
-    .filtros input, .filtros select {
-      padding: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .grafico-barras {
+    .card canvas {
+      width: 100% !important;
       height: 300px !important;
     }
   </style>
 </head>
 <body>
- <header>
+  <header>
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
   </header>
