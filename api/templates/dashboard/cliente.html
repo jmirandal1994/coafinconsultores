@@ -148,6 +148,10 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    .grafico-barras {
+      height: 300px !important;
+    }
   </style>
 </head>
 <body>
@@ -200,10 +204,10 @@
         <button id="aplicarFiltros">Buscar</button>
       </div>
       <button id="descargarExcel">Descargar Excel</button>
-    </div> 
-    
+    </div>
+
     <div class="graficos">
-      <div class="card">
+      <div class="card grafico-barras">
         <h3>Gráfico de Ingresos vs Gastos</h3>
         <canvas id="graficoFinanzas"></canvas>
       </div>
@@ -219,130 +223,96 @@
       <ul id="lista-movimientos"></ul>
     </div>
   </div>
-
+  
   <script>
-    const client = window.supabase.createClient(
+    const supabase = window.supabase.createClient(
       'https://iyskzhgjvchokwfxgqyc.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
     );
 
+    let movimientos = [];
     let ingresos = 0;
     let gastos = 0;
-    const categoriaData = {};
-
-    function actualizarUI() {
-      const balance = ingresos - gastos;
-      document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
-      document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
-      document.getElementById("balance").textContent = "$" + balance.toLocaleString();
-    }
-
-    const ctx = document.getElementById('graficoFinanzas').getContext('2d');
-    const grafico = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Ingresos', 'Gastos'],
-        datasets: [{
-          label: 'Resumen mensual',
-          data: [0, 0],
-          backgroundColor: ['#00c6ff', '#ff6b6b']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-
-    const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
-    const graficoCategorias = new Chart(ctxCategorias, {
-      type: 'pie',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Distribución por Categoría',
-          data: [],
-          backgroundColor: ['#4dc9f6','#f67019','#f53794','#537bc4','#acc236','#166a8f']
-        }]
-      },
-      options: { responsive: true }
-    });
-
-    async function eliminarMovimiento(id) {
-      const { error } = await client.from('movimientos').delete().eq('id', id);
-      if (!error) cargarMovimientos();
-    }
+    const grafico = new Chart(document.getElementById("graficoFinanzas"), { type: "bar", data: { labels: ["Ingresos", "Gastos"], datasets: [{ data: [0, 0], backgroundColor: ["#00c6ff", "#ff6b6b"] }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }});
+    const graficoCategorias = new Chart(document.getElementById("graficoCategorias"), { type: "pie", data: { labels: [], datasets: [{ data: [], backgroundColor: ["#4dc9f6", "#f67019", "#f53794", "#537bc4", "#acc236"] }] }, options: { responsive: true } });
 
     async function cargarMovimientos() {
-      const { data, error } = await client
-        .from('movimientos')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.from("movimientos").select("*").order("created_at", { ascending: false });
+      if (error) return alert("Error cargando movimientos");
+      movimientos = data;
+      renderizarMovimientos(data);
+    }
 
-      if (error) {
-        console.error("Error al cargar movimientos:", error);
-        return;
-      }
-
+    function renderizarMovimientos(data) {
       const lista = document.getElementById("lista-movimientos");
-      lista.innerHTML = '';
-
+      lista.innerHTML = "";
       ingresos = 0;
       gastos = 0;
       const categorias = {};
 
-      data.forEach(mov => {
+      data.forEach(m => {
         const li = document.createElement("li");
-        li.classList.add('movimiento');
-        li.classList.add(mov.tipo === "ingreso" ? "ingreso" : "gasto");
-        li.innerHTML = `
-          <span>${mov.tipo.toUpperCase()}: $${mov.monto} - ${mov.descripcion} (${mov.categoria})</span>
-          <button class="delete-btn" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
-        `;
+        li.className = `movimiento ${m.tipo}`;
+        const fecha = new Date(m.created_at).toLocaleDateString();
+        li.innerHTML = `<span>${m.tipo.toUpperCase()}: $${m.monto.toLocaleString()} - ${m.descripcion} (${m.categoria}) - ${fecha}</span><button class='delete-btn' onclick='eliminarMovimiento(${m.id})'>🗑️</button>`;
         lista.appendChild(li);
 
-        if (!categorias[mov.categoria]) categorias[mov.categoria] = 0;
-        categorias[mov.categoria] += mov.monto;
-
-        if (mov.tipo === "ingreso") ingresos += mov.monto;
-        else gastos += mov.monto;
+        if (m.tipo === "ingreso") ingresos += m.monto;
+        else gastos += m.monto;
+        categorias[m.categoria] = (categorias[m.categoria] || 0) + m.monto;
       });
 
-      actualizarUI();
+      document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
+      document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
+      document.getElementById("balance").textContent = "$" + (ingresos - gastos).toLocaleString();
+
       grafico.data.datasets[0].data = [ingresos, gastos];
       grafico.update();
-
       graficoCategorias.data.labels = Object.keys(categorias);
       graficoCategorias.data.datasets[0].data = Object.values(categorias);
       graficoCategorias.update();
     }
 
-    document.getElementById("mov-form").addEventListener("submit", async (e) => {
+    document.getElementById("mov-form").addEventListener("submit", async e => {
       e.preventDefault();
       const descripcion = document.getElementById("descripcion").value;
       const monto = parseFloat(document.getElementById("monto").value);
       const tipo = document.getElementById("tipo").value;
       const categoria = document.getElementById("categoria").value;
-
       if (!descripcion || isNaN(monto)) return;
 
-      const { error } = await client.from("movimientos").insert([
-        { descripcion, monto, tipo, categoria }
-      ]);
-
-      if (error) {
-        console.error("❌ Error al insertar:", error);
-        alert("Hubo un error al guardar el movimiento.");
-        return;
-      }
-
+      await supabase.from("movimientos").insert([{ descripcion, monto, tipo, categoria }]);
       e.target.reset();
-      await cargarMovimientos();
+      cargarMovimientos();
+    });
+
+    async function eliminarMovimiento(id) {
+      await supabase.from("movimientos").delete().eq("id", id);
+      cargarMovimientos();
+    }
+
+    document.getElementById("aplicarFiltros").addEventListener("click", () => {
+      const texto = document.getElementById("busqueda").value.toLowerCase();
+      const cat = document.getElementById("filtroCategoria").value;
+      const desde = document.getElementById("fechaDesde").value;
+      const hasta = document.getElementById("fechaHasta").value;
+      const filtrado = movimientos.filter(m => {
+        const desc = m.descripcion.toLowerCase();
+        const fecha = new Date(m.created_at);
+        return (!texto || desc.includes(texto)) && (!cat || m.categoria === cat) && (!desde || new Date(desde) <= fecha) && (!hasta || fecha <= new Date(hasta));
+      });
+      renderizarMovimientos(filtrado);
+    });
+
+    document.getElementById("descargarExcel").addEventListener("click", () => {
+      const wb = XLSX.utils.book_new();
+      const datos = movimientos.map(m => ({ Fecha: new Date(m.created_at).toLocaleDateString(), Tipo: m.tipo, Descripción: m.descripcion, Categoría: m.categoria, Monto: m.monto }));
+      const ws = XLSX.utils.json_to_sheet(datos);
+      XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
+      XLSX.writeFile(wb, "movimientos.xlsx");
     });
 
     cargarMovimientos();
   </script>
 </body>
 </html>
-
