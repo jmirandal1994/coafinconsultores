@@ -224,7 +224,7 @@
     </div>
   </div>
   
-  <script>
+<script>
     const supabase = window.supabase.createClient(
       'https://iyskzhgjvchokwfxgqyc.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
@@ -310,6 +310,14 @@
       const ws = XLSX.utils.json_to_sheet(datos);
       XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
       XLSX.writeFile(wb, "movimientos.xlsx");
+    });
+
+    document.getElementById("limpiarFiltros").addEventListener("click", () => {
+      document.getElementById("busqueda").value = "";
+      document.getElementById("filtroCategoria").value = "";
+      document.getElementById("fechaDesde").value = "";
+      document.getElementById("fechaHasta").value = "";
+      renderizarMovimientos(movimientos);
     });
 
     cargarMovimientos();
