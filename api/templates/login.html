@@ -89,7 +89,9 @@
 </head>
 <body>
   <div class="login-container">
-    <img src="./assets/logo.png" alt="COAFIN Logo" class="logo" />
+    <!-- LOGO FLASK STATIC -->
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="COAFIN Logo" class="logo" />
+    
     <form id="login-form">
       <h2>Login</h2>
 
@@ -130,9 +132,7 @@
       if (error) {
         errorMsg.textContent = 'Correo o contraseña incorrectos';
       } else {
-        // Aquí puedes diferenciar si es admin o cliente
-        // Por ahora redirige a cliente.html
-        window.location.href = './dashboard/cliente.html';
+        window.location.href = '/dashboard/cliente.html';
       }
     });
   </script>
