@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Cliente - COAFIN</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+    }
+
+    header {
+      background-color: #0f2027;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      width: 100px;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .summary .card {
+      flex: 1;
+      text-align: center;
+    }
+
+    form input, form select {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    form button {
+      padding: 10px 20px;
+      background-color: #0f2027;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../assets/logo.png" alt="Logo COAFIN" />
+    <h1>Bienvenido a tu Panel Financiero</h1>
+  </header>
+  <div class="container">
+    <div class="summary">
+      <div class="card">
+        <h3>Ingresos</h3>
+        <p id="ingresos">$0</p>
+      </div>
+      <div class="card">
+        <h3>Gastos</h3>
+        <p id="gastos">$0</p>
+      </div>
+      <div class="card">
+        <h3>Total Mensual</h3>
+        <p id="balance">$0</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Registrar Movimiento</h3>
+      <form id="mov-form">
+        <input type="text" id="descripcion" placeholder="Descripción" required />
+        <input type="number" id="monto" placeholder="Monto" required />
+        <select id="tipo">
+          <option value="ingreso">Ingreso</option>
+          <option value="gasto">Gasto</option>
+        </select>
+        <button type="submit">Guardar</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Gráfico de Ingresos vs Gastos</h3>
+      <canvas id="graficoFinanzas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const supabase = supabase.createClient(
+      'https://TU_PROYECTO.supabase.co',
+      'TU_API_KEY_PUBLICA'
+    );
+
+    let ingresos = 0;
+    let gastos = 0;
+
+    function actualizarUI() {
+      const balance = ingresos - gastos;
+      document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
+      document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
+      document.getElementById("balance").textContent = "$" + balance.toLocaleString();
+    }
+
+    const ctx = document.getElementById('graficoFinanzas').getContext('2d');
+    const grafico = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Ingresos', 'Gastos'],
+        datasets: [{
+          label: 'Resumen mensual',
+          data: [ingresos, gastos],
+          backgroundColor: ['#00c6ff', '#ff6b6b']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    document.getElementById("mov-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const descripcion = document.getElementById("descripcion").value;
+      const monto = parseFloat(document.getElementById("monto").value);
+      const tipo = document.getElementById("tipo").value;
+
+      if (tipo === 'ingreso') ingresos += monto;
+      else gastos += monto;
+
+      actualizarUI();
+      grafico.data.datasets[0].data = [ingresos, gastos];
+      grafico.update();
+
+      await supabase.from("movimientos").insert([
+        { descripcion, monto, tipo }
+      ]);
+
+      e.target.reset();
+    });
+
+    actualizarUI();
+  </script>
+</body>
+</html>
+
