@@ -90,7 +90,6 @@
 <body>
   <div class="login-container">
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="COAFIN Logo" class="logo" />
-
     <form id="login-form">
       <h2>Login</h2>
 
@@ -120,23 +119,24 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const usuarioIngresado = form.email.value.trim().toLowerCase();
+      const passwordIngresada = form.password.value;
 
       const { data, error } = await supabase
         .from('usuarios')
-        .select('tipo_usuario')
-        .eq('usuario', email)
-        .eq('password', password)
+        .select('*')
+        .eq('usuario', usuarioIngresado)
+        .eq('password', passwordIngresada)
         .single();
 
       if (error || !data) {
         errorMsg.textContent = 'Usuario o contraseña incorrectos';
       } else {
+        // Redirige según tipo de usuario
         if (data.tipo_usuario === 'admin') {
-          window.location.href = '/admin';
+          window.location.href = '/dashboard/admin.html';
         } else {
-          window.location.href = '/dashboard/cliente';
+          window.location.href = '/dashboard/cliente.html';
         }
       }
     });
