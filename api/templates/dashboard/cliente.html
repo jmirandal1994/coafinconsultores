@@ -155,18 +155,12 @@
   </style>
 </head>
 <body>
-  <header>
+ <header>
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
   </header>
 
   <div class="container">
-    <div class="summary">
-      <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
-      <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
-      <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
-    </div>
-
     <div class="card">
       <h3>Registrar Movimiento</h3>
       <form id="mov-form">
@@ -189,29 +183,33 @@
 
     <div class="card">
       <h3>Filtros</h3>
-      <div class="filtros">
-        <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
-        <select id="filtroCategoria">
-          <option value="">Todas las categorías</option>
-          <option value="Servicios">Servicios</option>
-          <option value="Insumos">Insumos</option>
-          <option value="Honorarios">Honorarios</option>
-          <option value="Arriendo">Arriendo</option>
-          <option value="Publicidad">Publicidad</option>
-        </select>
-        <input type="date" id="fechaDesde" />
-        <input type="date" id="fechaHasta" />
-        <button id="aplicarFiltros">Buscar</button>
-      </div>
+      <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
+      <select id="filtroCategoria">
+        <option value="">Todas las Categorías</option>
+        <option value="Servicios">Servicios</option>
+        <option value="Insumos">Insumos</option>
+        <option value="Honorarios">Honorarios</option>
+        <option value="Arriendo">Arriendo</option>
+        <option value="Publicidad">Publicidad</option>
+      </select>
+      <input type="date" id="fechaDesde" />
+      <input type="date" id="fechaHasta" />
+      <button id="aplicarFiltros">Buscar</button>
+      <button id="limpiarFiltros">Limpiar Filtros</button>
       <button id="descargarExcel">Descargar Excel</button>
     </div>
 
+    <div class="summary">
+      <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
+      <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
+      <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
+    </div>
+
     <div class="graficos">
-      <div class="card grafico-barras">
+      <div class="card" style="min-height: 300px;">
         <h3>Gráfico de Ingresos vs Gastos</h3>
         <canvas id="graficoFinanzas"></canvas>
       </div>
-
       <div class="card">
         <h3>Distribución por Categoría</h3>
         <canvas id="graficoCategorias"></canvas>
@@ -222,8 +220,7 @@
       <h3>Movimientos recientes</h3>
       <ul id="lista-movimientos"></ul>
     </div>
-  </div>
-  
+  </div>  
   <script>
     const supabase = window.supabase.createClient(
       'https://iyskzhgjvchokwfxgqyc.supabase.co',
