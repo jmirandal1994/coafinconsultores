@@ -148,104 +148,110 @@
   </div>
 
   <script>
-    const client = window.supabase.createClient(
-      'https://iyskzhgjvchokwfxgqyc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
-    );
+  const client = window.supabase.createClient(
+    'https://iyskzhgjvchokwfxgqyc.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
+  );
 
-    let ingresos = 0;
-    let gastos = 0;
+  let ingresos = 0;
+  let gastos = 0;
 
-    function actualizarUI() {
-      const balance = ingresos - gastos;
-      document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
-      document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
-      document.getElementById("balance").textContent = "$" + balance.toLocaleString();
-    }
+  function actualizarUI() {
+    const balance = ingresos - gastos;
+    document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
+    document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
+    document.getElementById("balance").textContent = "$" + balance.toLocaleString();
+  }
 
-    const ctx = document.getElementById('graficoFinanzas').getContext('2d');
-    const grafico = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Ingresos', 'Gastos'],
-        datasets: [{
-          label: 'Resumen mensual',
-          data: [0, 0],
-          backgroundColor: ['#00c6ff', '#ff6b6b']
-        }]
+  const ctx = document.getElementById('graficoFinanzas').getContext('2d');
+  const grafico = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Ingresos', 'Gastos'],
+      datasets: [{
+        label: 'Resumen mensual',
+        data: [0, 0],
+        backgroundColor: ['#00c6ff', '#ff6b6b']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode: 'index', intersect: false }
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { mode: 'index', intersect: false }
-        },
-        scales: {
-          y: { beginAtZero: true }
-        }
+      scales: {
+        y: { beginAtZero: true }
       }
-    });
+    }
+  });
 
-    async function eliminarMovimiento(id) {
-      const { error } = await client.from('movimientos').delete().eq('id', id);
-      if (!error) cargarMovimientos();
+  async function eliminarMovimiento(id) {
+    const { error } = await client.from('movimientos').delete().eq('id', id);
+    if (!error) cargarMovimientos();
+  }
+
+  async function cargarMovimientos() {
+    const { data, error } = await client
+      .from('movimientos')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error al cargar movimientos:", error);
+      return;
     }
 
-    async function cargarMovimientos() {
-      const { data, error } = await client
-        .from('movimientos')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const lista = document.getElementById("lista-movimientos");
+    lista.innerHTML = '';
 
-      if (error) {
-        console.error("Error al cargar movimientos:", error);
-        return;
-      }
+    ingresos = 0;
+    gastos = 0;
 
-      const lista = document.getElementById("lista-movimientos");
-      lista.innerHTML = '';
+    data.forEach(mov => {
+      const li = document.createElement("li");
+      li.classList.add('movimiento');
+      li.classList.add(mov.tipo === "ingreso" ? "ingreso" : "gasto");
 
-      ingresos = 0;
-      gastos = 0;
+      li.innerHTML = `
+        <span>${mov.tipo.toUpperCase()}: $${mov.monto} - ${mov.descripcion}</span>
+        <button class="delete-btn" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
+      `;
 
-      data.forEach(mov => {
-        const li = document.createElement("li");
-        li.classList.add('movimiento');
-        li.classList.add(mov.tipo === "ingreso" ? "ingreso" : "gasto");
+      lista.appendChild(li);
 
-        li.innerHTML = `
-          <span>${mov.tipo.toUpperCase()}: $${mov.monto} - ${mov.descripcion}</span>
-          <button class="delete-btn" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
-        `;
-
-        lista.appendChild(li);
-
-        if (mov.tipo === "ingreso") ingresos += mov.monto;
-        else gastos += mov.monto;
-      });
-
-      actualizarUI();
-      grafico.data.datasets[0].data = [ingresos, gastos];
-      grafico.update();
-    }
-
-    document.getElementById("mov-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const descripcion = document.getElementById("descripcion").value;
-      const monto = parseFloat(document.getElementById("monto").value);
-      const tipo = document.getElementById("tipo").value;
-
-      if (!descripcion || isNaN(monto)) return;
-
-      await client.from("movimientos").insert([
-        { descripcion, monto, tipo }
-      ]);
-
-      e.target.reset();
-      await cargarMovimientos();
+      if (mov.tipo === "ingreso") ingresos += mov.monto;
+      else gastos += mov.monto;
     });
 
-    cargarMovimientos();
+    actualizarUI();
+    grafico.data.datasets[0].data = [ingresos, gastos];
+    grafico.update();
+  }
+
+  document.getElementById("mov-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const descripcion = document.getElementById("descripcion").value;
+    const monto = parseFloat(document.getElementById("monto").value);
+    const tipo = document.getElementById("tipo").value;
+
+    if (!descripcion || isNaN(monto)) return;
+
+    const { error } = await client.from("movimientos").insert([
+      { descripcion, monto, tipo }
+    ]);
+
+    if (error) {
+      console.error("❌ Error al insertar:", error);
+      alert("Hubo un error al guardar el movimiento.");
+      return;
+    }
+
+    e.target.reset();
+    await cargarMovimientos();
+  });
+
+  cargarMovimientos();
   </script>
 </body>
 </html>
