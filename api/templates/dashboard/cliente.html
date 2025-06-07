@@ -110,18 +110,23 @@
     .graficos .card {
       flex: 1;
       min-width: 250px;
-     }
-    #graficoFinanzas {
-      width: 100% !important;
-      height: 300px !important;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .graficos .card canvas#graficoCategorias {
-      height: auto !important;
+    #graficoFinanzas {
+      max-width: 100%;
+      max-height: 300px;
+    }
+    #graficoCategorias {
+      max-width: 100%;
+      max-height: 300px;
     }
   </style>
 </head>
 <body>
+  
   <header>
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
