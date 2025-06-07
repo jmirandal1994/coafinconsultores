@@ -33,6 +33,36 @@
       max-width: 1100px;
       margin: auto;
     }
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+    .summary .card {
+      flex: 1;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.15);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+    .summary .card:nth-child(1) {
+      background-color: #e6f9ec;
+      color: #1a7f4f;
+    }
+    .summary .card:nth-child(2) {
+      background-color: #ffe9e9;
+      color: #a12626;
+    }
+    .summary .card:nth-child(3) {
+      background-color: #e2f0f9;
+      color: #17536d;
+    }
     .card {
       background: white;
       padding: 20px;
@@ -43,18 +73,6 @@
     .card h3 {
       margin-top: 0;
       text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-    }
-    .summary {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-    }
-    .summary .card {
-      flex: 1;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.15);
     }
     form input, form select {
       padding: 10px;
@@ -125,8 +143,7 @@
     }
   </style>
 </head>
-<body>
-  
+<body>  
   <header>
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
     <h1>Bienvenido a tu Panel Financiero</h1>
