@@ -1,317 +1,678 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Cliente - COAFIN</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-    }
-    header {
-      background-color: #0f2027;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    header img {
-      width: 150px;
-      filter: brightness(0) invert(1);
-      margin-bottom: 10px;
-    }
-    header h1 {
-      font-size: 22px;
-      margin-top: 8px;
-    }
-    .summary {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 30px;
-      max-width: 1100px;
-      margin: auto;
-      flex-wrap: wrap;
-    }
-    .summary .card {
-      flex: 1;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.15);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      background: white;
-      min-width: 220px;
-    }
-    .summary .card:nth-child(1) {
-      background-color: #e6f9ec;
-      color: #1a7f4f;
-    }
-    .summary .card:nth-child(2) {
-      background-color: #ffe9e9;
-      color: #a12626;
-    }
-    .summary .card:nth-child(3) {
-      background-color: #e2f0f9;
-      color: #17536d;
-    }
-    .container {
-      padding: 30px;
-      max-width: 1100px;
-      margin: auto;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .card h3 {
-      margin-top: 0;
-      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-    }
-    form input, form select {
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    form button {
-      padding: 10px 20px;
-      background-color: #0f2027;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    .movimiento {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      margin-bottom: 6px;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .ingreso {
-      background-color: #e6f9ec;
-      color: #1a7f4f;
-    }
-    .gasto {
-      background-color: #ffe9e9;
-      color: #a12626;
-    }
-    .delete-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #888;
-      font-size: 16px;
-    }
-    .delete-btn:hover {
-      color: #e00;
-    }
-    .graficos {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .graficos .card {
-      flex: 1 1 45%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 400px;
-    }
-    #graficoFinanzas, #graficoCategorias {
-      max-width: 100%;
-      max-height: 350px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Cliente - COAFIN</title>
+    <!-- Incluir los scripts necesarios -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Fuentes de Google Fonts para un aspecto más profesional -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Variables CSS para una gestión de colores y espaciado más fácil */
+        :root {
+            --primary-dark: #2c3e50; /* Azul oscuro corporativo */
+            --primary-medium: #34495e; /* Azul grisáceo */
+            --primary-light: #ecf0f1; /* Gris muy claro */
+            --accent-green: #27ae60; /* Verde para ingresos */
+            --accent-red: #e74c3c; /* Rojo para gastos */
+            --accent-blue: #3498db; /* Azul para saldos / información */
+            --text-dark: #333;
+            --text-light: #fdfdfd;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --border-radius-base: 8px;
+            --padding-base: 20px;
+            --gap-base: 20px;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif; /* Usando Inter para un look moderno */
+            background-color: var(--primary-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Estilos del encabezado */
+        header {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            padding: var(--padding-base) 0;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--shadow-medium);
+            position: relative; /* Para posicionar el botón de cerrar sesión */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        header img {
+            width: 120px; /* Tamaño ajustado del logo */
+            height: auto;
+            filter: brightness(0) invert(1); /* Logo blanco sobre fondo oscuro */
+            margin-bottom: 15px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .logout-btn {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-base);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            position: absolute; /* Posiciona el botón */
+            top: var(--padding-base);
+            right: var(--padding-base);
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Contenedor principal */
+        .container {
+            padding: 30px;
+            max-width: 1200px; /* Ancho ligeramente mayor */
+            margin: var(--gap-base) auto;
+            display: grid;
+            gap: var(--gap-base);
+            grid-template-columns: 1fr; /* Default a una columna para móviles */
+            flex-grow: 1;
+        }
+
+        /* Estilo base de las tarjetas */
+        .card {
+            background: white;
+            padding: var(--padding-base);
+            margin-bottom: 0; /* Ya manejado por el gap de grid/flex */
+            border-radius: var(--border-radius-base);
+            box-shadow: 0 4px 15px var(--shadow-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Tarjetas de resumen */
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--gap-base);
+            flex-wrap: wrap; /* Permitir que las tarjetas se envuelvan */
+        }
+
+        .summary .card {
+            flex: 1; /* Permite que las tarjetas crezcan y se encojan */
+            min-width: 280px; /* Ancho mínimo para evitar que se aplasten demasiado */
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: none; /* Eliminar text-shadow para un look más limpio */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .summary .card p {
+            font-size: 24px;
+            margin: 5px 0 0;
+            font-weight: 700;
+        }
+
+        .summary .card:nth-child(1) { /* Ingresos */
+            background-color: #e8f5e9; /* Verde claro */
+            color: var(--accent-green);
+            border: 1px solid #c8e6c9;
+        }
+
+        .summary .card:nth-child(2) { /* Gastos */
+            background-color: #ffebee; /* Rojo claro */
+            color: var(--accent-red);
+            border: 1px solid #ffcdd2;
+        }
+
+        .summary .card:nth-child(3) { /* Total Mensual */
+            background-color: #e3f2fd; /* Azul claro */
+            color: var(--accent-blue);
+            border: 1px solid #bbdefb;
+        }
+
+        /* Formularios */
+        form input, form select {
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: calc(100% - 30px); /* Ajustar por padding */
+            border-radius: var(--border-radius-base);
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            box-sizing: border-box; /* Incluir padding en el width */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        form input:focus, form select:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+            outline: none;
+        }
+
+        form button {
+            padding: 12px 25px;
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-base);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 15px;
+            width: auto; /* Ancho natural */
+            display: inline-block; /* Para que margin-right funcione si hay varios botones */
+        }
+
+        form button:hover {
+            background-color: var(--primary-medium);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px var(--shadow-medium);
+        }
+
+        /* Botones de acción específicos para los filtros */
+        #aplicarFiltros, #limpiarFiltros, #descargarExcel {
+            margin-right: 10px; /* Espacio entre botones de filtro */
+        }
+
+        #descargarExcel {
+            background-color: var(--accent-green); /* Color para descargar */
+        }
+        #descargarExcel:hover {
+            background-color: #219d53;
+        }
+
+        /* Lista de movimientos */
+        #lista-movimientos {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+
+        .movimiento {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius-base);
+            font-size: 15px;
+            background-color: #f8f8f8; /* Fondo sutil para cada elemento */
+            border: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+        .movimiento:hover {
+            background-color: #f2f2f2;
+        }
+
+        .ingreso {
+            background-color: #e8f5e9;
+            color: var(--accent-green);
+        }
+        .gasto {
+            background-color: #ffebee;
+            color: var(--accent-red);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-medium);
+            font-size: 18px;
+            transition: color 0.2s ease, transform 0.1s ease;
+        }
+        .delete-btn:hover {
+            color: var(--accent-red);
+            transform: scale(1.1);
+        }
+
+        /* Gráficos */
+        .graficos {
+            display: flex;
+            gap: var(--gap-base);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .graficos .card {
+            flex: 1 1 calc(50% - var(--gap-base) / 2); /* Dos columnas, con espacio */
+            min-width: 300px; /* Asegura que no se aplaste en pantallas más pequeñas */
+            height: 400px; /* Altura fija para la consistencia del gráfico */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Incluir padding y borde en el tamaño total */
+        }
+
+        #graficoFinanzas, #graficoCategorias {
+            max-width: 100%;
+            max-height: 100%; /* Llenar el espacio de la tarjeta */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding-top: 80px; /* Espacio para el botón de cerrar sesión flotante */
+            }
+            .logout-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+            .container {
+                padding: 15px;
+                grid-template-columns: 1fr; /* Una columna para todo */
+            }
+            .summary .card, .graficos .card {
+                flex-basis: 100%; /* Ocupar todo el ancho disponible */
+                min-width: unset; /* Eliminar min-width */
+            }
+            form input, form select {
+                width: calc(100% - 20px); /* Ajustar por padding móvil */
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .graficos .card {
+                flex-basis: calc(50% - var(--gap-base) / 2);
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
-    <h1>Bienvenido a tu Panel Financiero</h1>
-    <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
-  </header>
+    <header>
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
+        <h1>Bienvenido a tu Panel Financiero</h1>
+        <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+    </header>
 
-  <div class="container">
-    <div class="card">
-      <h3>Registrar Movimiento</h3>
-      <form id="mov-form">
-        <input type="text" id="descripcion" placeholder="Descripción" required />
-        <input type="number" id="monto" placeholder="Monto" required />
-        <select id="tipo">
-          <option value="ingreso">Ingreso</option>
-          <option value="gasto">Gasto</option>
-        </select>
-        <select id="categoria">
-          <option value="Servicios">Servicios</option>
-          <option value="Insumos">Insumos</option>
-          <option value="Honorarios">Honorarios</option>
-          <option value="Arriendo">Arriendo</option>
-          <option value="Publicidad">Publicidad</option>
-        </select>
-        <button type="submit">Guardar</button>
-      </form>
-    </div>
+    <div class="container">
+        <div class="card">
+            <h3>Registrar Movimiento</h3>
+            <form id="mov-form">
+                <input type="text" id="descripcion" placeholder="Descripción" required />
+                <input type="number" id="monto" placeholder="Monto" required />
+                <select id="tipo">
+                    <option value="ingreso">Ingreso</option>
+                    <option value="gasto">Gasto</option>
+                </select>
+                <select id="categoria">
+                    <option value="Credito Banco Chile 1">Crédito Banco Chile 1</option>
+                    <option value="Credito Banco Chile 2">Crédito Banco Chile 2</option>
+                    <option value="Remuneraciones">Remuneraciones</option>
+                    <option value="Honorarios">Honorarios</option>
+                    <option value="Patente Municipal">Patente Municipal</option>
+                    <option value="Gastos con boleta">Gastos con boleta</option>
+                    <option value="Pago Proveedores">Pago Proveedores</option>
+                    <option value="Arriendo de bodega">Arriendo de bodega</option>
+                    <option value="Seguros">Seguros</option>
+                    <option value="Previred">Previred</option>
+                    <option value="Impuesto mensual">Impuesto mensual</option>
+                    <option value="Anticipo de sueldos">Anticipo de sueldos</option>
+                    <option value="Ingresos veterinaria">Ingresos veterinaria</option>
+                    <option value="Ingresos servicios veterinarios">Ingresos servicios veterinarios</option>
+                    <option value="Finiquitos">Finiquitos</option>
+                    <option value="Retiro socio J Lopez">Retiro socio J Lopez</option>
+                    <option value="Retiro socia M Munoz">Retiro socia M Munoz</option>
+                    <option value="Otra cuenta">Otra cuenta</option>
+                    <option value="Varios">Varios</option>
+                </select>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
 
-    <div class="card">
-      <h3>Filtros</h3>
-      <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
-      <select id="filtroCategoria">
-        <option value="">Todas las Categorías</option>
-        <option value="Servicios">Servicios</option>
-        <option value="Insumos">Insumos</option>
-        <option value="Honorarios">Honorarios</option>
-        <option value="Arriendo">Arriendo</option>
-        <option value="Publicidad">Publicidad</option>
-      </select>
-      <input type="date" id="fechaDesde" />
-      <input type="date" id="fechaHasta" />
-      <button id="aplicarFiltros">Buscar</button>
-      <button id="limpiarFiltros">Limpiar Filtros</button>
-      <button id="descargarExcel">Descargar Excel</button>
-    </div>
+        <div class="card">
+            <h3>Filtros</h3>
+            <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
+            <select id="filtroCategoria">
+                <option value="">Todas las Categorías</option>
+                <option value="Credito Banco Chile 1">Crédito Banco Chile 1</option>
+                <option value="Credito Banco Chile 2">Crédito Banco Chile 2</option>
+                <option value="Remuneraciones">Remuneraciones</option>
+                <option value="Honorarios">Honorarios</option>
+                <option value="Patente Municipal">Patente Municipal</option>
+                <option value="Gastos con boleta">Gastos con boleta</option>
+                <option value="Pago Proveedores">Pago Proveedores</option>
+                <option value="Arriendo de bodega">Arriendo de bodega</option>
+                <option value="Seguros">Seguros</option>
+                <option value="Previred">Previred</option>
+                <option value="Impuesto mensual">Impuesto mensual</option>
+                <option value="Anticipo de sueldos">Anticipo de sueldos</option>
+                <option value="Ingresos veterinaria">Ingresos veterinaria</option>
+                <option value="Ingresos servicios veterinarios">Ingresos servicios veterinarios</option>
+                <option value="Finiquitos">Finiquitos</option>
+                <option value="Retiro socio J Lopez">Retiro socio J Lopez</option>
+                <option value="Retiro socia M Munoz">Retiro socia M Munoz</option>
+                <option value="Otra cuenta">Otra cuenta</option>
+                <option value="Varios">Varios</option>
+            </select>
+            <input type="date" id="fechaDesde" />
+            <input type="date" id="fechaHasta" />
+            <button id="aplicarFiltros">Buscar</button>
+            <button id="limpiarFiltros">Limpiar Filtros</button>
+            <button id="descargarExcel">Descargar Excel</button>
+        </div>
 
-    <div class="summary">
-      <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
-      <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
-      <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
-    </div>
+        <div class="summary">
+            <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
+            <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
+            <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
+        </div>
 
-    <div class="graficos">
-      <div class="card" style="min-height: 300px;">
-        <h3>Gráfico de Ingresos vs Gastos</h3>
-        <canvas id="graficoFinanzas"></canvas>
-      </div>
-      <div class="card">
-        <h3>Distribución por Categoría</h3>
-        <canvas id="graficoCategorias"></canvas>
-      </div>
-    </div>
+        <div class="graficos">
+            <div class="card">
+                <h3>Gráfico de Ingresos vs Gastos</h3>
+                <canvas id="graficoFinanzas"></canvas>
+            </div>
+            <div class="card">
+                <h3>Distribución por Categoría</h3>
+                <canvas id="graficoCategorias"></canvas>
+            </div>
+        </div>
 
-    <div class="card">
-      <h3>Movimientos recientes</h3>
-      <ul id="lista-movimientos"></ul>
-    </div>
-  </div>  
-  <script>
-    const supabase = window.supabase.createClient(
-      'https://iyskzhgjvchokwfxgqyc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
-    );
+        <div class="card">
+            <h3>Movimientos recientes</h3>
+            <ul id="lista-movimientos"></ul>
+        </div>
+    </div> 
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://iyskzhgjvchokwfxgqyc.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c2t6aGdqdmNob2t3ZnhncXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyNjk5MjcsImV4cCI6MjA2Mzg0NTkyN30.r5KqQ4Ed1QUEZZ-zBOKNeApwtgyA4shhNHyu9zrqt5A'
+        );
 
-    let movimientos = [];
-    let ingresos = 0;
-    let gastos = 0;
-    const grafico = new Chart(document.getElementById("graficoFinanzas"), { type: "bar", data: { labels: ["Ingresos", "Gastos"], datasets: [{ data: [0, 0], backgroundColor: ["#00c6ff", "#ff6b6b"] }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }});
-    const graficoCategorias = new Chart(document.getElementById("graficoCategorias"), { type: "pie", data: { labels: [], datasets: [{ data: [], backgroundColor: ["#4dc9f6", "#f67019", "#f53794", "#537bc4", "#acc236"] }] }, options: { responsive: true } });
+        let movimientos = [];
+        let ingresos = 0;
+        let gastos = 0;
 
-    async function cargarMovimientos() {
-      const { data, error } = await supabase.from("movimientos").select("*").order("created_at", { ascending: false });
-      if (error) return alert("Error cargando movimientos");
-      movimientos = data;
-      console.log("Movimientos cargados:", movimientos);
-      renderizarMovimientos(data);
-    }
+        // Gráficos inicialización (con opciones mejoradas)
+        const graficoFinanzasCtx = document.getElementById("graficoFinanzas").getContext('2d');
+        const grafico = new Chart(graficoFinanzasCtx, {
+            type: "bar",
+            data: {
+                labels: ["Ingresos", "Gastos"],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: ["#27ae60", "#e74c3c"], /* Colores de acento */
+                    borderRadius: 5 /* Bordes redondeados en las barras */
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }, /* Ocultar leyenda si solo hay un dataset */
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += '$' + context.parsed.y.toLocaleString();
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)' /* Líneas de cuadrícula más suaves */
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
 
-    function renderizarMovimientos(data) {
-      const lista = document.getElementById("lista-movimientos");
-      lista.innerHTML = "";
-      ingresos = 0;
-      gastos = 0;
-      const categorias = {};
+        const graficoCategoriasCtx = document.getElementById("graficoCategorias").getContext('2d');
+        const graficoCategorias = new Chart(graficoCategoriasCtx, {
+            type: "pie",
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#3498db', '#9b59b6', '#e67e22', '#2ecc71', '#f1c40f',
+                        '#1abc9c', '#7f8c8d', '#d35400', '#c0392b', '#8e44ad',
+                        '#2c3e50', '#f39c12', '#2980b9', '#16a085', '#bdc3c7',
+                        '#95a5a6', '#2d3436', '#ffeaa7', '#a29bfe'
+                    ], /* Paleta de colores más amplia para categorías */
+                    hoverOffset: 10 /* Efecto de resalte al pasar el mouse */
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right', /* Leyenda a la derecha para mejor visibilidad */
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += '$' + context.parsed.toLocaleString();
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-      data.forEach(m => {
-        const li = document.createElement("li");
-        li.className = `movimiento ${m.tipo}`;
-        const fecha = new Date(m.created_at).toLocaleDateString();
-        li.innerHTML = `<span>${m.tipo.toUpperCase()}: $${m.monto.toLocaleString()} - ${m.descripcion} (${m.categoria}) - ${fecha}</span><button class='delete-btn' onclick='eliminarMovimiento(${m.id})'>🗑️</button>`;
-        lista.appendChild(li);
+        async function cargarMovimientos() {
+            const { data, error } = await supabase.from("movimientos").select("*").order("created_at", { ascending: false });
+            if (error) {
+                console.error("Error cargando movimientos:", error);
+                alert("Error cargando movimientos.");
+                return;
+            }
+            movimientos = data;
+            console.log("Movimientos cargados:", movimientos);
+            renderizarMovimientos(data);
+        }
 
-        if (m.tipo === "ingreso") ingresos += m.monto;
-        else gastos += m.monto;
-        categorias[m.categoria] = (categorias[m.categoria] || 0) + m.monto;
-      });
+        function renderizarMovimientos(data) {
+            const lista = document.getElementById("lista-movimientos");
+            lista.innerHTML = "";
+            ingresos = 0;
+            gastos = 0;
+            const categorias = {};
 
-      document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString();
-      document.getElementById("gastos").textContent = "$" + gastos.toLocaleString();
-      document.getElementById("balance").textContent = "$" + (ingresos - gastos).toLocaleString();
+            data.forEach(m => {
+                const li = document.createElement("li");
+                li.className = `movimiento ${m.tipo}`;
+                const fecha = new Date(m.created_at).toLocaleDateString();
+                li.innerHTML = `
+                    <span>
+                        <span style="font-weight: 700;">${m.tipo.toUpperCase()}:</span> 
+                        <span style="font-size: 1.1em;">$${m.monto.toLocaleString('es-CL')}</span> 
+                        - ${m.descripcion} 
+                        (<span style="font-style: italic;">${m.categoria}</span>) 
+                        - <span style="color: #666; font-size: 0.9em;">${fecha}</span>
+                    </span>
+                    <button class='delete-btn' onclick='eliminarMovimiento(${m.id})'>🗑️</button>
+                `;
+                lista.appendChild(li);
 
-      grafico.data.datasets[0].data = [ingresos, gastos];
-      grafico.update();
-      graficoCategorias.data.labels = Object.keys(categorias);
-      graficoCategorias.data.datasets[0].data = Object.values(categorias);
-      graficoCategorias.update();
-    }
+                if (m.tipo === "ingreso") ingresos += m.monto;
+                else gastos += m.monto;
+                categorias[m.categoria] = (categorias[m.categoria] || 0) + m.monto;
+            });
 
-    document.getElementById("mov-form").addEventListener("submit", async e => {
-      e.preventDefault();
-      const descripcion = document.getElementById("descripcion").value;
-      const monto = parseFloat(document.getElementById("monto").value);
-      const tipo = document.getElementById("tipo").value;
-      const categoria = document.getElementById("categoria").value;
-      if (!descripcion || isNaN(monto)) return;
+            document.getElementById("ingresos").textContent = "$" + ingresos.toLocaleString('es-CL');
+            document.getElementById("gastos").textContent = "$" + gastos.toLocaleString('es-CL');
+            document.getElementById("balance").textContent = "$" + (ingresos - gastos).toLocaleString('es-CL');
 
-      await supabase.from("movimientos").insert([{ descripcion, monto, tipo, categoria }]);
-      e.target.reset();
-      cargarMovimientos();
-    });
+            // Actualizar gráfico de finanzas
+            grafico.data.datasets[0].data = [ingresos, gastos];
+            grafico.update();
 
-    async function eliminarMovimiento(id) {
-      await supabase.from("movimientos").delete().eq("id", id);
-      cargarMovimientos();
-    }
-    function cerrarSesion() {
-      window.location.href = "/";
-    }
+            // Actualizar gráfico de categorías
+            graficoCategorias.data.labels = Object.keys(categorias);
+            graficoCategorias.data.datasets[0].data = Object.values(categorias);
+            graficoCategorias.update();
+        }
 
-    document.getElementById("aplicarFiltros").addEventListener("click", () => {
-      const texto = document.getElementById("busqueda").value.toLowerCase();
-      const cat = document.getElementById("filtroCategoria").value;
-      const desde = document.getElementById("fechaDesde").value;
-      const hasta = document.getElementById("fechaHasta").value;
-      const filtrado = movimientos.filter(m => {
-        const desc = m.descripcion.toLowerCase();
-        const fecha = new Date(m.created_at);
-        return (!texto || desc.includes(texto)) && (!cat || m.categoria === cat) && (!desde || new Date(desde) <= fecha) && (!hasta || fecha <= new Date(hasta));
-      });
-      renderizarMovimientos(filtrado);
-    });
+        document.getElementById("mov-form").addEventListener("submit", async e => {
+            e.preventDefault();
+            const descripcion = document.getElementById("descripcion").value;
+            const monto = parseFloat(document.getElementById("monto").value);
+            const tipo = document.getElementById("tipo").value;
+            const categoria = document.getElementById("categoria").value;
+            
+            if (!descripcion || isNaN(monto) || monto <= 0) {
+                alert("Por favor, introduce una descripción válida y un monto numérico positivo.");
+                return;
+            }
 
-    document.getElementById("descargarExcel").addEventListener("click", () => {
-      const wb = XLSX.utils.book_new();
-      const datos = movimientos.map(m => ({ Fecha: new Date(m.created_at).toLocaleDateString(), Tipo: m.tipo, Descripción: m.descripcion, Categoría: m.categoria, Monto: m.monto }));
-      const ws = XLSX.utils.json_to_sheet(datos);
-      XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
-      XLSX.writeFile(wb, "movimientos.xlsx");
-    });
+            const { error } = await supabase.from("movimientos").insert([{ descripcion, monto, tipo, categoria }]);
+            if (error) {
+                console.error("Error al guardar movimiento:", error);
+                alert("Error al guardar el movimiento.");
+                return;
+            }
+            
+            e.target.reset();
+            cargarMovimientos();
+        });
 
-    document.getElementById("limpiarFiltros").addEventListener("click", () => {
-      document.getElementById("busqueda").value = "";
-      document.getElementById("filtroCategoria").value = "";
-      document.getElementById("fechaDesde").value = "";
-      document.getElementById("fechaHasta").value = "";
-      renderizarMovimientos(movimientos);
-    });
+        async function eliminarMovimiento(id) {
+            if (!confirm("¿Estás seguro de que quieres eliminar este movimiento?")) {
+                return;
+            }
+            const { error } = await supabase.from("movimientos").delete().eq("id", id);
+            if (error) {
+                console.error("Error al eliminar movimiento:", error);
+                alert("Error al eliminar el movimiento.");
+                return;
+            }
+            cargarMovimientos();
+        }
 
-    cargarMovimientos();
-  </script>
+        function cerrarSesion() {
+            // Aquí podrías agregar una confirmación o una llamada a una ruta de Flask si usas sesiones de servidor.
+            window.location.href = "/";
+        }
+
+        document.getElementById("aplicarFiltros").addEventListener("click", () => {
+            const texto = document.getElementById("busqueda").value.toLowerCase();
+            const cat = document.getElementById("filtroCategoria").value;
+            const desdeStr = document.getElementById("fechaDesde").value;
+            const hastaStr = document.getElementById("fechaHasta").value;
+
+            let desde = null;
+            if (desdeStr) {
+                desde = new Date(desdeStr);
+                desde.setHours(0, 0, 0, 0); // Ajustar a inicio del día
+            }
+
+            let hasta = null;
+            if (hastaStr) {
+                hasta = new Date(hastaStr);
+                hasta.setHours(23, 59, 59, 999); // Ajustar a fin del día
+            }
+
+            const filtrado = movimientos.filter(m => {
+                const desc = m.descripcion.toLowerCase();
+                const fechaMovimiento = new Date(m.created_at);
+                
+                return (!texto || desc.includes(texto)) &&
+                       (!cat || m.categoria === cat) &&
+                       (!desde || fechaMovimiento >= desde) &&
+                       (!hasta || fechaMovimiento <= hasta);
+            });
+            renderizarMovimientos(filtrado);
+        });
+
+        document.getElementById("descargarExcel").addEventListener("click", () => {
+            const wb = XLSX.utils.book_new();
+            const datosParaExcel = movimientos.map(m => ({ 
+                Fecha: new Date(m.created_at).toLocaleDateString('es-CL'), 
+                Tipo: m.tipo.charAt(0).toUpperCase() + m.tipo.slice(1), /* Capitalizar la primera letra */
+                Descripción: m.descripcion, 
+                Categoría: m.categoria, 
+                Monto: m.monto 
+            }));
+            const ws = XLSX.utils.json_to_sheet(datosParaExcel);
+            XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
+            XLSX.writeFile(wb, "movimientos.xlsx");
+        });
+
+        document.getElementById("limpiarFiltros").addEventListener("click", () => {
+            document.getElementById("busqueda").value = "";
+            document.getElementById("filtroCategoria").value = "";
+            document.getElementById("fechaDesde").value = "";
+            document.getElementById("fechaHasta").value = "";
+            cargarMovimientos(); /* Recargar todos los movimientos */
+        });
+
+        // Cargar movimientos al iniciar la página
+        cargarMovimientos();
+    </script>
 </body>
 </html>
