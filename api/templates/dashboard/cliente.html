@@ -592,12 +592,21 @@
                         ticks: {
                             callback: function(value) {
                                 return '$' + value.toLocaleString('es-CL'); /* Formato en eje Y */
-                            }
+                            },
+                            font: { /* Ajustar tamaño de fuente */
+                                size: 12
+                            },
+                            padding: 10 /* Más padding para que no se corte */
                         }
                     },
                     x: {
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            font: { /* Ajustar tamaño de fuente para eje X */
+                                size: 12
+                            }
                         }
                     }
                 }
