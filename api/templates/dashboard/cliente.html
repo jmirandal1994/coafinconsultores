@@ -10,46 +10,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <!-- Fuentes de Google Fonts para un aspecto más profesional -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         /* Variables CSS para una gestión de colores y espaciado más fácil */
         :root {
-            --primary-dark: #2c3e50; /* Azul oscuro corporativo */
-            --primary-medium: #34495e; /* Azul grisáceo */
-            --primary-light: #ecf0f1; /* Gris muy claro */
-            --accent-green: #27ae60; /* Verde para ingresos */
-            --accent-red: #e74c3c; /* Rojo para gastos */
-            --accent-blue: #3498db; /* Azul para saldos / información */
-            --text-dark: #333;
-            --text-light: #fdfdfd;
-            --border-color: #e0e0e0;
-            --shadow-light: rgba(0, 0, 0, 0.08);
-            --shadow-medium: rgba(0, 0, 0, 0.15);
-            --border-radius-base: 8px;
-            --padding-base: 20px;
-            --gap-base: 20px;
+            --primary-dark: #2C3E50; /* Azul oscuro profundo */
+            --primary-medium: #34495E; /* Azul grisáceo sutil */
+            --primary-light: #ECF0F1; /* Gris muy claro para fondos */
+            --accent-green: #27AE60; /* Verde brillante para ingresos */
+            --accent-red: #E74C3C; /* Rojo vibrante para gastos */
+            --accent-blue: #3498DB; /* Azul para saldos / información */
+            --text-dark: #333333; /* Texto principal oscuro */
+            --text-light: #FDFDFD; /* Texto claro */
+            --border-color: #E0E0E0; /* Borde sutil */
+            --shadow-light: rgba(0, 0, 0, 0.06); /* Sombra muy suave */
+            --shadow-medium: rgba(0, 0, 0, 0.12); /* Sombra ligeramente más pronunciada */
+            --shadow-strong: rgba(0, 0, 0, 0.2); /* Sombra para elementos flotantes */
+            --border-radius-base: 12px; /* Radios más grandes para un look moderno */
+            --padding-base: 25px; /* Más padding para aire */
+            --gap-base: 25px; /* Espacio entre elementos de grid/flex */
         }
 
         body {
             margin: 0;
-            font-family: 'Inter', sans-serif; /* Usando Inter para un look moderno */
+            font-family: 'Inter', sans-serif; /* Inter para el cuerpo */
             background-color: var(--primary-light);
             color: var(--text-dark);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* Prevenir scroll horizontal */
         }
 
         /* Estilos del encabezado */
         header {
-            background-color: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%); /* Degradado sutil */
             color: var(--text-light);
-            padding: var(--padding-base) 0;
+            padding: var(--padding-base) 0 40px 0; /* Más padding abajo para la sección de título */
             text-align: center;
-            box-shadow: 0 4px 15px var(--shadow-medium);
-            position: relative; /* Para posicionar el botón de cerrar sesión */
+            box-shadow: 0 6px 20px var(--shadow-strong); /* Sombra más fuerte */
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -57,203 +61,279 @@
         }
 
         header img {
-            width: 120px; /* Tamaño ajustado del logo */
+            width: 100px; /* Tamaño del logo ajustado */
             height: auto;
-            filter: brightness(0) invert(1); /* Logo blanco sobre fondo oscuro */
-            margin-bottom: 15px;
+            filter: brightness(0) invert(1);
+            margin-bottom: 10px; /* Menos espacio si el título está cerca */
         }
 
         header h1 {
-            font-size: 28px;
+            font-family: 'Montserrat', sans-serif; /* Montserrat para títulos importantes */
+            font-size: 32px; /* Título más grande y prominente */
             margin-top: 0;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            font-weight: 800; /* Más grueso */
+            letter-spacing: 0.8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Sombra de texto más marcada */
         }
 
         .logout-btn {
             background-color: var(--accent-red);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: var(--border-radius-base);
             cursor: pointer;
             font-weight: 600;
+            font-size: 15px;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            position: absolute; /* Posiciona el botón */
-            top: var(--padding-base);
-            right: var(--padding-base);
-            font-size: 14px;
+            position: absolute;
+            top: 20px; /* Ajuste para móviles, se mantiene así por defecto */
+            right: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .logout-btn:hover {
             background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transform: translateY(-3px); /* Efecto más pronunciado */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
+        .logout-btn i {
+            font-size: 16px;
+        }
+
 
         /* Contenedor principal */
         .container {
-            padding: 30px;
-            max-width: 1200px; /* Ancho ligeramente mayor */
-            margin: var(--gap-base) auto;
+            padding: var(--gap-base);
+            max-width: 1280px; /* Ancho máximo aumentado */
+            margin: -60px auto var(--gap-base) auto; /* Margen superior negativo para superponer con el header */
             display: grid;
             gap: var(--gap-base);
-            grid-template-columns: 1fr; /* Default a una columna para móviles */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Más flexible para diferentes anchos */
             flex-grow: 1;
+            align-items: start; /* Alinear tarjetas en la parte superior */
         }
 
         /* Estilo base de las tarjetas */
         .card {
             background: white;
             padding: var(--padding-base);
-            margin-bottom: 0; /* Ya manejado por el gap de grid/flex */
             border-radius: var(--border-radius-base);
-            box-shadow: 0 4px 15px var(--shadow-light);
+            box-shadow: 0 4px 18px var(--shadow-medium); /* Sombra más suave y extendida */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color); /* Borde sutil */
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px var(--shadow-medium);
+            transform: translateY(-5px); /* Efecto de elevación más notorio */
+            box-shadow: 0 8px 25px var(--shadow-strong);
         }
 
         .card h3 {
+            font-family: 'Montserrat', sans-serif;
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: var(--primary-dark);
-            font-size: 20px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            font-size: 22px; /* Títulos de tarjeta más grandes */
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color); /* Borde inferior más grueso */
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Tarjetas de resumen */
         .summary {
+            grid-column: 1 / -1; /* Ocupa todo el ancho */
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around; /* Distribuye espacio */
             gap: var(--gap-base);
-            flex-wrap: wrap; /* Permitir que las tarjetas se envuelvan */
+            flex-wrap: wrap;
+            margin-top: 20px; /* Espacio extra después de las primeras tarjetas */
         }
 
         .summary .card {
-            flex: 1; /* Permite que las tarjetas crezcan y se encojan */
-            min-width: 280px; /* Ancho mínimo para evitar que se aplasten demasiado */
+            flex: 1;
+            min-width: 250px; /* Ajuste para pantallas medianas */
             text-align: center;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 18px;
-            text-shadow: none; /* Eliminar text-shadow para un look más limpio */
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease; /* Transición para cambios de fondo */
         }
 
         .summary .card p {
-            font-size: 24px;
-            margin: 5px 0 0;
-            font-weight: 700;
+            font-size: 32px; /* Valores monetarios más grandes */
+            margin: 10px 0 0;
+            font-weight: 800; /* Más grueso */
+            letter-spacing: 0.5px;
         }
 
         .summary .card:nth-child(1) { /* Ingresos */
-            background-color: #e8f5e9; /* Verde claro */
-            color: var(--accent-green);
-            border: 1px solid #c8e6c9;
+            background-color: #D4EDDA; /* Verde pastel */
+            color: #155724;
+            border: 1px solid #C3E6CB;
         }
-
         .summary .card:nth-child(2) { /* Gastos */
-            background-color: #ffebee; /* Rojo claro */
-            color: var(--accent-red);
-            border: 1px solid #ffcdd2;
+            background-color: #F8D7DA; /* Rojo pastel */
+            color: #721C24;
+            border: 1px solid #F5C6CB;
+        }
+        .summary .card:nth-child(3) { /* Total Mensual */
+            background-color: #CCE5FF; /* Azul pastel */
+            color: #004085;
+            border: 1px solid #B8DAFF;
         }
 
-        .summary .card:nth-child(3) { /* Total Mensual */
-            background-color: #e3f2fd; /* Azul claro */
-            color: var(--accent-blue);
-            border: 1px solid #bbdefb;
+        /* Iconos en tarjetas de resumen */
+        .summary .card h3 i {
+            font-size: 24px;
+            margin-right: 10px;
         }
 
         /* Formularios */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Espaciado entre campos */
+        }
         form input, form select {
-            padding: 12px 15px;
-            margin: 8px 0;
-            width: calc(100% - 30px); /* Ajustar por padding */
-            border-radius: var(--border-radius-base);
+            padding: 14px 18px;
+            margin: 0; /* Resetear margen para usar gap */
+            width: 100%;
+            border-radius: var(--border-radius-base); /* Más redondeado */
             border: 1px solid var(--border-color);
             font-size: 16px;
-            box-sizing: border-box; /* Incluir padding en el width */
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         form input:focus, form select:focus {
-            border-color: var(--primary-dark);
-            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+            border-color: var(--accent-blue); /* Borde azul al enfocar */
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15); /* Sombra de enfoque más suave */
             outline: none;
         }
-
         form button {
-            padding: 12px 25px;
+            padding: 14px 30px;
             background-color: var(--primary-dark);
             color: white;
             border: none;
             border-radius: var(--border-radius-base);
             cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700; /* Más grueso */
+            font-size: 17px;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
             margin-top: 15px;
-            width: auto; /* Ancho natural */
-            display: inline-block; /* Para que margin-right funcione si hay varios botones */
+            width: auto;
+            align-self: flex-start; /* Alinear botón a la izquierda */
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         form button:hover {
             background-color: var(--primary-medium);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px var(--shadow-medium);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow-medium);
         }
 
         /* Botones de acción específicos para los filtros */
-        #aplicarFiltros, #limpiarFiltros, #descargarExcel {
-            margin-right: 10px; /* Espacio entre botones de filtro */
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Espacio entre los botones de filtro */
+            margin-top: 15px;
+        }
+        .filter-buttons button {
+            flex-grow: 1; /* Permite que los botones crezcan */
+            margin-top: 0; /* Resetear margen de button base */
+            align-self: stretch; /* Asegura que tengan la misma altura */
         }
 
         #descargarExcel {
-            background-color: var(--accent-green); /* Color para descargar */
+            background-color: var(--accent-green);
         }
         #descargarExcel:hover {
-            background-color: #219d53;
+            background-color: #219150;
         }
+        #limpiarFiltros {
+            background-color: #95a5a6; /* Gris más neutral para limpiar */
+        }
+        #limpiarFiltros:hover {
+            background-color: #7f8c8d;
+        }
+
 
         /* Lista de movimientos */
         #lista-movimientos {
             list-style: none;
             padding-left: 0;
-            margin-top: 15px;
+            margin-top: 20px; /* Más espacio */
         }
 
         .movimiento {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 10px;
+            padding: 15px 20px; /* Más padding */
+            margin-bottom: 12px; /* Más espacio entre elementos */
             border-radius: var(--border-radius-base);
-            font-size: 15px;
-            background-color: #f8f8f8; /* Fondo sutil para cada elemento */
+            font-size: 16px;
+            background-color: #FDFDFD; /* Fondo más blanco */
             border: 1px solid var(--border-color);
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
         .movimiento:hover {
-            background-color: #f2f2f2;
+            background-color: #F2F2F2;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Sombra suave en hover */
+        }
+
+        .movimiento span {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px; /* Espacio entre los elementos del texto */
+        }
+        .movimiento .monto {
+            font-weight: 700;
+            font-size: 1.2em; /* Monto ligeramente más grande */
+        }
+        .movimiento .descripcion {
+            font-weight: 500;
+        }
+        .movimiento .categoria {
+            font-style: normal; /* No cursiva */
+            font-weight: 400;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background-color: rgba(0,0,0,0.05);
+            font-size: 0.9em;
+        }
+        .movimiento .fecha {
+            color: #888;
+            font-size: 0.85em;
         }
 
         .ingreso {
-            background-color: #e8f5e9;
+            background-color: #E8F5E9;
             color: var(--accent-green);
+            border-left: 6px solid var(--accent-green); /* Borde de color */
         }
         .gasto {
-            background-color: #ffebee;
+            background-color: #FFEBEB;
             color: var(--accent-red);
+            border-left: 6px solid var(--accent-red); /* Borde de color */
         }
 
         .delete-btn {
@@ -261,16 +341,17 @@
             border: none;
             cursor: pointer;
             color: var(--primary-medium);
-            font-size: 18px;
+            font-size: 20px; /* Icono un poco más grande */
             transition: color 0.2s ease, transform 0.1s ease;
         }
         .delete-btn:hover {
             color: var(--accent-red);
-            transform: scale(1.1);
+            transform: scale(1.15); /* Efecto de escala más pronunciado */
         }
 
         /* Gráficos */
         .graficos {
+            grid-column: 1 / -1; /* Ocupa todo el ancho en el grid */
             display: flex;
             gap: var(--gap-base);
             flex-wrap: wrap;
@@ -278,42 +359,48 @@
         }
 
         .graficos .card {
-            flex: 1 1 calc(50% - var(--gap-base) / 2); /* Dos columnas, con espacio */
-            min-width: 300px; /* Asegura que no se aplaste en pantallas más pequeñas */
-            height: 400px; /* Altura fija para la consistencia del gráfico */
+            flex: 1 1 calc(50% - var(--gap-base) / 2);
+            min-width: 320px; /* Asegura que no se aplaste en pantallas más pequeñas */
+            height: 450px; /* Altura ligeramente mayor para los gráficos */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-sizing: border-box; /* Incluir padding y borde en el tamaño total */
-        }
-
-        #graficoFinanzas, #graficoCategorias {
-            max-width: 100%;
-            max-height: 100%; /* Llenar el espacio de la tarjeta */
+            box-sizing: border-box;
+            padding: var(--padding-base); /* Asegurar padding */
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             header {
-                flex-direction: column;
-                padding-top: 80px; /* Espacio para el botón de cerrar sesión flotante */
+                padding-top: 90px; /* Más espacio superior para el botón de cerrar sesión flotante */
             }
             .logout-btn {
-                position: absolute;
                 top: 20px;
                 right: 20px;
             }
             .container {
                 padding: 15px;
-                grid-template-columns: 1fr; /* Una columna para todo */
+                margin-top: -40px; /* Ajuste del margen negativo para móviles */
             }
             .summary .card, .graficos .card {
-                flex-basis: 100%; /* Ocupar todo el ancho disponible */
-                min-width: unset; /* Eliminar min-width */
+                flex-basis: 100%;
+                min-width: unset;
             }
             form input, form select {
-                width: calc(100% - 20px); /* Ajustar por padding móvil */
+                width: calc(100% - 20px);
+            }
+            .filter-buttons {
+                flex-direction: column; /* Botones de filtro apilados */
+            }
+            .filter-buttons button {
+                width: 100%;
+            }
+            .card h3 {
+                font-size: 20px; /* Títulos de tarjeta más pequeños en móvil */
+            }
+            .summary .card p {
+                font-size: 28px; /* Monto de resumen un poco más pequeño */
             }
         }
 
@@ -321,6 +408,23 @@
             .graficos .card {
                 flex-basis: calc(50% - var(--gap-base) / 2);
             }
+            .summary .card {
+                min-width: 200px; /* Permite 3 columnas en tablet si hay espacio */
+            }
+        }
+        @media (min-width: 1025px) {
+            .container {
+                grid-template-columns: 1fr 1fr; /* 2 columnas en pantallas grandes */
+            }
+            /* Alinear "Registrar Movimiento" y "Filtros" en la primera fila */
+            .card:nth-child(1) { grid-column: 1; grid-row: 1; }
+            .card:nth-child(2) { grid-column: 2; grid-row: 1; }
+            /* Luego las tarjetas de resumen abarcan todo el ancho */
+            .summary { grid-column: 1 / -1; grid-row: 2; }
+            /* Los gráficos abarcan todo el ancho también */
+            .graficos { grid-column: 1 / -1; grid-row: 3; }
+            /* La lista de movimientos se ajusta después */
+            .card:nth-child(5) { grid-column: 1 / -1; grid-row: 4; } /* Ajustar este según el orden real si cambias */
         }
     </style>
 </head>
@@ -328,12 +432,12 @@
     <header>
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo COAFIN" />
         <h1>Bienvenido a tu Panel Financiero</h1>
-        <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+        <button class="logout-btn" onclick="cerrarSesion()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
     </header>
 
     <div class="container">
         <div class="card">
-            <h3>Registrar Movimiento</h3>
+            <h3><i class="fa-solid fa-plus-circle"></i> Registrar Movimiento</h3>
             <form id="mov-form">
                 <input type="text" id="descripcion" placeholder="Descripción" required />
                 <input type="number" id="monto" placeholder="Monto" required />
@@ -362,12 +466,12 @@
                     <option value="Otra cuenta">Otra cuenta</option>
                     <option value="Varios">Varios</option>
                 </select>
-                <button type="submit">Guardar</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Guardar</button>
             </form>
         </div>
 
         <div class="card">
-            <h3>Filtros</h3>
+            <h3><i class="fa-solid fa-filter"></i> Filtros</h3>
             <input type="text" id="busqueda" placeholder="Buscar por descripción..." />
             <select id="filtroCategoria">
                 <option value="">Todas las Categorías</option>
@@ -393,30 +497,32 @@
             </select>
             <input type="date" id="fechaDesde" />
             <input type="date" id="fechaHasta" />
-            <button id="aplicarFiltros">Buscar</button>
-            <button id="limpiarFiltros">Limpiar Filtros</button>
-            <button id="descargarExcel">Descargar Excel</button>
+            <div class="filter-buttons">
+                <button id="aplicarFiltros"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                <button id="limpiarFiltros"><i class="fa-solid fa-xmark"></i> Limpiar Filtros</button>
+                <button id="descargarExcel"><i class="fa-solid fa-download"></i> Descargar Excel</button>
+            </div>
         </div>
 
         <div class="summary">
-            <div class="card"><h3>Ingresos</h3><p id="ingresos">$0</p></div>
-            <div class="card"><h3>Gastos</h3><p id="gastos">$0</p></div>
-            <div class="card"><h3>Total Mensual</h3><p id="balance">$0</p></div>
+            <div class="card"><h3><i class="fa-solid fa-arrow-alt-circle-up"></i> Ingresos</h3><p id="ingresos">$0</p></div>
+            <div class="card"><h3><i class="fa-solid fa-arrow-alt-circle-down"></i> Gastos</h3><p id="gastos">$0</p></div>
+            <div class="card"><h3><i class="fa-solid fa-balance-scale"></i> Total Mensual</h3><p id="balance">$0</p></div>
         </div>
 
         <div class="graficos">
             <div class="card">
-                <h3>Gráfico de Ingresos vs Gastos</h3>
+                <h3><i class="fa-solid fa-chart-bar"></i> Gráfico de Ingresos vs Gastos</h3>
                 <canvas id="graficoFinanzas"></canvas>
             </div>
             <div class="card">
-                <h3>Distribución por Categoría</h3>
+                <h3><i class="fa-solid fa-chart-pie"></i> Distribución por Categoría</h3>
                 <canvas id="graficoCategorias"></canvas>
             </div>
         </div>
 
         <div class="card">
-            <h3>Movimientos recientes</h3>
+            <h3><i class="fa-solid fa-list-alt"></i> Movimientos recientes</h3>
             <ul id="lista-movimientos"></ul>
         </div>
     </div> 
@@ -455,7 +561,7 @@
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += '$' + context.parsed.y.toLocaleString();
+                                    label += '$' + context.parsed.y.toLocaleString('es-CL'); /* Formato chileno */
                                 }
                                 return label;
                             }
@@ -467,6 +573,11 @@
                         beginAtZero: true,
                         grid: {
                             color: 'rgba(0, 0, 0, 0.05)' /* Líneas de cuadrícula más suaves */
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('es-CL'); /* Formato en eje Y */
+                            }
                         }
                     },
                     x: {
@@ -502,7 +613,8 @@
                         position: 'right', /* Leyenda a la derecha para mejor visibilidad */
                         labels: {
                             font: {
-                                size: 14
+                                size: 14,
+                                family: 'Inter' /* Aplicar fuente a la leyenda */
                             }
                         }
                     },
@@ -514,7 +626,7 @@
                                     label += ': ';
                                 }
                                 if (context.parsed !== null) {
-                                    label += '$' + context.parsed.toLocaleString();
+                                    label += '$' + context.parsed.toLocaleString('es-CL'); /* Formato chileno */
                                 }
                                 return label;
                             }
@@ -546,16 +658,16 @@
             data.forEach(m => {
                 const li = document.createElement("li");
                 li.className = `movimiento ${m.tipo}`;
-                const fecha = new Date(m.created_at).toLocaleDateString();
+                const fecha = new Date(m.created_at).toLocaleDateString('es-CL'); /* Formato chileno para la fecha */
                 li.innerHTML = `
-                    <span>
-                        <span style="font-weight: 700;">${m.tipo.toUpperCase()}:</span> 
-                        <span style="font-size: 1.1em;">$${m.monto.toLocaleString('es-CL')}</span> 
-                        - ${m.descripcion} 
-                        (<span style="font-style: italic;">${m.categoria}</span>) 
-                        - <span style="color: #666; font-size: 0.9em;">${fecha}</span>
+                    <span class="movement-details">
+                        <span class="type-label" style="font-weight: 700;">${m.tipo.toUpperCase()}:</span> 
+                        <span class="monto">$${m.monto.toLocaleString('es-CL')}</span> 
+                        <span class="descripcion">- ${m.descripcion}</span> 
+                        (<span class="categoria">${m.categoria}</span>) 
+                        - <span class="fecha">${fecha}</span>
                     </span>
-                    <button class='delete-btn' onclick='eliminarMovimiento(${m.id})'>🗑️</button>
+                    <button class='delete-btn' onclick='eliminarMovimiento(${m.id})'><i class="fa-solid fa-trash-can"></i></button>
                 `;
                 lista.appendChild(li);
 
@@ -580,13 +692,17 @@
 
         document.getElementById("mov-form").addEventListener("submit", async e => {
             e.preventDefault();
-            const descripcion = document.getElementById("descripcion").value;
+            const descripcion = document.getElementById("descripcion").value.trim(); /* Eliminar espacios extra */
             const monto = parseFloat(document.getElementById("monto").value);
             const tipo = document.getElementById("tipo").value;
             const categoria = document.getElementById("categoria").value;
             
             if (!descripcion || isNaN(monto) || monto <= 0) {
                 alert("Por favor, introduce una descripción válida y un monto numérico positivo.");
+                return;
+            }
+            if (!categoria) { /* Asegurarse que se ha seleccionado una categoría */
+                alert("Por favor, selecciona una categoría.");
                 return;
             }
 
@@ -602,6 +718,7 @@
         });
 
         async function eliminarMovimiento(id) {
+            // Reemplazar alert/confirm con un modal personalizado si es para el ambiente final
             if (!confirm("¿Estás seguro de que quieres eliminar este movimiento?")) {
                 return;
             }
@@ -620,7 +737,7 @@
         }
 
         document.getElementById("aplicarFiltros").addEventListener("click", () => {
-            const texto = document.getElementById("busqueda").value.toLowerCase();
+            const texto = document.getElementById("busqueda").value.toLowerCase().trim();
             const cat = document.getElementById("filtroCategoria").value;
             const desdeStr = document.getElementById("fechaDesde").value;
             const hastaStr = document.getElementById("fechaHasta").value;
@@ -628,13 +745,13 @@
             let desde = null;
             if (desdeStr) {
                 desde = new Date(desdeStr);
-                desde.setHours(0, 0, 0, 0); // Ajustar a inicio del día
+                desde.setUTCHours(0, 0, 0, 0); /* Usar UTC para evitar problemas de zona horaria con la BD */
             }
 
             let hasta = null;
             if (hastaStr) {
                 hasta = new Date(hastaStr);
-                hasta.setHours(23, 59, 59, 999); // Ajustar a fin del día
+                hasta.setUTCHours(23, 59, 59, 999); /* Usar UTC para evitar problemas de zona horaria con la BD */
             }
 
             const filtrado = movimientos.filter(m => {
